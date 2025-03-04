@@ -115,10 +115,10 @@ def threadOPS(img_path, new_img_path, label_path, new_label_path):
 # Please modify the path
 if __name__ == '__main__':
     # DRIVE
-    threadOPS("DRIVE/training/images",  # set your path of training images
-              "DRIVE/aug/images",
-              "DRIVE/training/1st_manual",  # set your path of training labels
-              "DRIVE/aug/label")
+    threadOPS("SA_Uet-pytorch/DRIVE/training/images",  # set your path of training images
+              "SA_Uet-pytorch/DRIVE/aug/images",
+              "SA_Uet-pytorch/DRIVE/training/1st_manual",  # set your path of training labels
+              "SA_Uet-pytorch/DRIVE/aug/label")
 
     # CHANSEDB1
 #     os.makedirs("CHASEDB1/aug/images")
