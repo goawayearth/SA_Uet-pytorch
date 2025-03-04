@@ -1,7 +1,6 @@
 import logging
 import os
 import random
-
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFile
 
@@ -52,7 +51,9 @@ class DataAugmentation:
             return im
 
         img = np.asarray(image)
-        img.flags.writeable = 1
+        if not img.flags.writeable:  # 检查是否可写，不可写则创建副本
+            img = img.copy()
+
         width, height = img.shape[:2]
         img_r = gaussianNoisy(img[:, :, 0].flatten(), mean, sigma)
         img_g = gaussianNoisy(img[:, :, 1].flatten(), mean, sigma)
@@ -90,6 +91,14 @@ def threadOPS(img_path, new_img_path, label_path, new_label_path):
     img_names = os.listdir(img_path)
     label_names = os.listdir(label_path)
 
+    if not os.path.exists(new_img_path):
+        os.makedirs(new_img_path)  # 创建多级目录
+        #print(f"Created directory: {new_img_path}")
+
+    if not os.path.exists(new_label_path):
+        os.makedirs(new_label_path)
+        #print(f"Created directory: {new_label_path}")
+
     img_num = len(img_names)
     label_num = len(label_names)
 
@@ -119,6 +128,18 @@ if __name__ == '__main__':
               "SA_Uet-pytorch/DRIVE/aug/images",
               "SA_Uet-pytorch/DRIVE/training/1st_manual",  # set your path of training labels
               "SA_Uet-pytorch/DRIVE/aug/label")
+
+    """threadOPS("DRIVE/training/images",  # set your path of training images
+              "DRIVE/aug/images",
+              "DRIVE/training/1st_manual",  # set your path of training labels
+              "DRIVE/aug/label")"""
+
+
+
+
+
+
+
 
     # CHANSEDB1
 #     os.makedirs("CHASEDB1/aug/images")
