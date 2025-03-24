@@ -26,7 +26,7 @@ def reduce_value(value, average=True):
         return value
 
 
-def criterion(inputs, target, args):
+'''def criterion(inputs, target, args):
     loss1 = 0
 
     # 为BCE设置权重
@@ -53,10 +53,38 @@ def criterion(inputs, target, args):
             if not args.sigmoid:
                 inputs = torch.nn.Sigmoid()(inputs)
             loss1 = 1 - dice_coeff(inputs, target)
+    return loss1 + loss2'''
+
+def criterion(image,inputs, target, args):
+    loss1 = 0
+
+    # 为BCE设置权重
+    weight = (torch.ones_like(target).float() * args.weight).cuda()
+    weight[target == 0] = 0
+
+    if type(inputs) is list:
+        if args.sigmoid:
+            loss2 = sum([nn.BCELoss(weight=weight)(i, image) for i in inputs])
+        else:
+            loss2 = sum([nn.BCEWithLogitsLoss(weight=weight)(i, image) for i in inputs])
+    else:
+        if args.sigmoid:
+            loss2 = nn.BCELoss(weight=weight)(inputs, image)
+        else:
+            loss2 = nn.BCEWithLogitsLoss(weight=weight)(inputs, image)
+
+    if args.dice:
+        if type(inputs) is list:
+            if not args.sigmoid:
+                inputs = [torch.nn.Sigmoid()(i) for i in inputs]
+            loss1 = sum([1 - dice_coeff(i, image) for i in inputs])
+        else:
+            if not args.sigmoid:
+                inputs = torch.nn.Sigmoid()(inputs)
+            loss1 = 1 - dice_coeff(inputs, image)
     return loss1 + loss2
 
-
-def criterion_focal(inputs, target, args):
+'''def criterion_focal(inputs, target, args):
     loss_f = FocalLoss(alpha=[1, args.weight], smooth=False)
     if type(inputs) is list:
         inputs = [torch.nn.Softmax(dim=1)(i) for i in inputs]
@@ -65,7 +93,7 @@ def criterion_focal(inputs, target, args):
         inputs = torch.nn.Softmax(dim=1)(inputs)
         loss2 = loss_f(inputs, target)
 
-    return loss2
+    return loss2'''
 
 
 def evaluate(model, data_loader, num_classes, args):
@@ -117,9 +145,9 @@ def train_one_epoch(model, optimizer, data_loader, epoch, scheduler, args, scale
         with torch.cuda.amp.autocast(enabled=scaler is not None):
             output = model(image)
             if not args.use_focal:
-                loss = criterion(output, target, args)
+                loss = criterion(image,output, target, args)
             else:
-                loss = criterion_focal(output, target, args)
+                loss = criterion(output, target, args)
         optimizer.zero_grad()
 
         if scaler is not None:
