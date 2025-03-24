@@ -10,12 +10,10 @@ class DropBlock(nn.Module):
         self.p = p
 
     def calculate_gamma(self, x: Tensor) -> float:
-        """计算gamma
-        Args:
+        '''Args:
             x (Tensor): 输入张量
         Returns:
-            Tensor: gamma
-        """
+            Tensor: gamma'''
 
         invalid = (1 - self.p) / (self.block_size ** 2)
         valid = (x.shape[-1] ** 2) / ((x.shape[-1] - self.block_size + 1) ** 2)
