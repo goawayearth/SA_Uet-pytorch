@@ -145,7 +145,7 @@ def train_one_epoch(model, optimizer, data_loader, epoch, scheduler, args, scale
         with torch.cuda.amp.autocast(enabled=scaler is not None):
             output = model(image)
             if not args.use_focal:
-                loss = criterion(image.convert('L'), output, target, args)
+                loss = criterion(image, torch.cat([output, output, output], dim=1), target, args)
             else:
                 loss = criterion(output, target, args)
         optimizer.zero_grad()
