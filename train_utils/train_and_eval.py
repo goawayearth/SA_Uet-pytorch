@@ -55,7 +55,7 @@ def reduce_value(value, average=True):
             loss1 = 1 - dice_coeff(inputs, target)
     return loss1 + loss2'''
 
-def criterion(image,inputs, target, args):
+def criterion(image, inputs, target, args):
     loss1 = 0
 
     # 为BCE设置权重
